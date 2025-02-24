@@ -5,8 +5,197 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Object Detection</title>
     <link rel="icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9ImN1cnJlbnRDb2xvciIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGNsYXNzPSJsdWNpZGUgbHVjaWRlLWNwdSI+PHJlY3Qgd2lkdGg9IjE2IiBoZWlnaHQ9IjE2IiB4PSI0IiB5PSI0IiByeD0iMiIvPjxyZWN0IHdpZHRoPSI2IiBoZWlnaHQ9IjYiIHg9IjkiIHk9IjkiIHJ4PSIxIi8+PHBhdGggZD0iTTE1IDJ2MiIvPjxwYXRoIGQ9Ik0xNSAyMHYyIi8+PHBhdGggZD0iTTIgMTVoMiIvPjxwYXRoIGQ9Ik0yIDloMiIvPjxwYXRoIGQ9Ik0yMCAxNWgyIi8+PHBhdGggZD0iTTIwIDloMiIvPjxwYXRoIGQ9Ik05IDJ2MiIvPjxwYXRoIGQ9Ik05IDIwdjIiLz48L3N2Zz4=">
-    <link rel="stylesheet" href="styles.css">
-    <script defer src="app.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Kumbh+Sans:wght@100..900&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Kumbh Sans";
+        }
+
+        body {
+            background-color: rgb(204, 223, 209);
+            background-image: url(Images/ml-image.jpg);
+            background-size: 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            width: 70%;
+            height: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgb(141, 151, 168, 0.5);
+            -webkit-backdrop-filter: blur(4px);
+            backdrop-filter: blur(4px);
+            border-radius: 1rem;
+        }
+
+        .image-container {
+            width: fit-content;
+            height: 60%;
+            display: none;
+            justify-content: center;
+            align-items: center;
+
+            #imagePreview {
+                display: none;
+                max-width: 90%;
+                max-height: 90%;
+                border-radius: 0.75rem;
+            }
+        }
+
+        .img-area {
+            width: 90%;
+            height: 60%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(194, 207, 194, 0.8);
+            border-radius: 0.75rem;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+
+            img {
+                margin-right: 0.5rem;
+            }
+        }
+
+        .upload-form {
+            margin-top: 2rem;
+            width: 90%;
+
+            input {
+                display: none;
+            }
+
+            .choose {
+                width: 100%;
+                height: 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 1rem;
+                border-radius: 0.7rem;
+                border: none;
+                background-color: rgb(56, 128, 196);
+                font-size: 1rem;
+                color: #f1f1f1;
+                cursor: pointer;
+
+                img {
+                    height: 21px;
+                    filter: invert(1);
+                    margin-right: 0.5rem;
+                }
+            }
+
+            .submit {
+                width: 100%;
+                height: 2.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1rem;
+                color: #f1f1f1;
+                border: none;
+                border-radius: 0.7rem;
+                background-color: rgb(56, 128, 196);
+                cursor: pointer;
+
+                img {
+                    height: 21px;
+                    filter: invert(1);
+                    margin-right: 0.5rem;
+                }
+            }
+        }
+
+        @media screen and (max-width: 1400px) {
+            body {
+                background-size: 150%;
+            }
+        }
+
+        @media screen and (max-width: 960px) {
+            body {
+                background-size: 200%;
+                background-position: left;
+            }
+        }
+
+        @media screen and (max-width: 700px) {
+            body {
+                background-size: 250%;
+            }
+        }
+
+        @media screen and (max-width: 560px) {
+            body {
+                background-size: 300%;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            body {
+                background-position: left;
+                background-size: 450%;
+            }
+
+            .container {
+                width: 90%;
+                height: 40%;
+            }
+
+            .upload-form {
+                margin-top: 0.5rem;
+                .choose {
+                    height: 2.25rem;
+                }
+
+                .submit {
+                    height: 2.25rem;
+                }
+            }
+        }
+    </style>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const input = event.target;
+            const preview = document.getElementById('imagePreview');
+            const upload = document.getElementById('uploadArea');
+            const imgContainer = document.getElementById('imageContainer');
+        
+            if (input.files && input.files[0]) {
+              const reader = new FileReader();
+        
+              reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                upload.style.display = 'none';
+                imgContainer.style.display = 'flex';
+            };
+        
+              reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.src = '#';
+                preview.style.display = 'none';
+                upload.style.display = 'block';
+                imgContainer.style.display = 'none';
+            }
+        });
+    </script>
 </head>
 <body>
     <div class="container">
